@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: 'docker/server/Dockerfile'
+      args:
+        ENVIRONMENT: ${ENVIRONMENT:-dev}
+    environment:
+      DATABASE: &db 'postgresql://postgres:postgres@postgres:5432/postgres'
+      SECRET_KEY: ${SECRET_KEY:-secret_key}
+
+      MAX_REQUESTS: ${MAX_REQUESTS:-50000}
+      LIMIT_CONCURRENCY: ${LIMIT_CONCURRENCY:-500}
+
+      LOGGING_LEVEL: 'DEBUG'
+      PYTHONASYNCIODEBUG: 'true'
+    ports:
+      - '${PORT:-8000}:8000'
+    volumes:
+      - '.:/app/'
+      # - './docker/server/start.sh:/start.sh:ro'
+    restart: always
+    init: true
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+
+  postgres:
+    image: 'postgres:11.2'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
