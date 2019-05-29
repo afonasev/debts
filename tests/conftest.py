@@ -8,7 +8,7 @@ from .factories import OperationFactory, PersonFactory, UserFactory
 from .factories import session as factories_session
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def client():
     with TestClient(app) as _client:
         yield _client

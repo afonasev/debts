@@ -20,7 +20,7 @@ def _response_with_token(user: User, status_code: int) -> JSONResponse:
     response.set_cookie(
         key=config.ACCESS_TOKEN_COOKIE,
         value=create_access_token(user),
-        secure=True,
+        secure=config.SECURE_COOKIES,
         httponly=True,
     )
     return response

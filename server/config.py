@@ -12,7 +12,8 @@ class Config(BaseSettings):
     SENTRY_DSN: Optional[DSN] = None
     LOGGING_LEVEL: str = 'INFO'
     LOGGING_FORMAT: str = '%(asctime)s %(levelname)s %(name)s %(message)s'
-    ACCESS_TOKEN_COOKIE: str = 'X-ACCESS-TOKEN'
+    ACCESS_TOKEN_COOKIE: str = 'X-Access-Token'
+    SECURE_COOKIES: bool = True
 
     class Config:
         env_prefix = ''
