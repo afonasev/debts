@@ -8,7 +8,7 @@ from .api.operations import router as operations_router
 from .api.persons import router as persons_router
 from .config import config
 from .db import Base, engine
-from .utils import check_access_token
+from .utils import check_access
 
 
 def create_app() -> FastAPI:
@@ -38,13 +38,13 @@ def init_routers(app: FastAPI) -> None:
         persons_router,
         prefix='/api/users',
         tags=['Persons'],
-        dependencies=[Depends(check_access_token)],
+        dependencies=[Depends(check_access)],
     )
     app.include_router(
         operations_router,
         prefix='/api/users',
         tags=['Operations'],
-        dependencies=[Depends(check_access_token)],
+        dependencies=[Depends(check_access)],
     )
 
 

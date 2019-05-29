@@ -3,6 +3,7 @@ from starlette.testclient import TestClient
 
 from server.app import app
 from server.db import Base, engine, session
+from server.utils import create_access_token
 
 from .factories import OperationFactory, PersonFactory, UserFactory
 from .factories import session as factories_session
@@ -41,3 +42,13 @@ def person(user):
 @pytest.fixture()
 def operation(person):
     return OperationFactory(person_id=person.id)
+
+
+@pytest.fixture()
+def access_token(user):
+    return create_access_token(user)
+
+
+@pytest.fixture(autouse=True)
+def headers(mocker, access_token):
+    return {'Authorization': f'Bearer {access_token}'}

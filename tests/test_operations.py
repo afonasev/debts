@@ -1,23 +1,13 @@
 from http import HTTPStatus
 from unittest.mock import ANY
 
-import pytest
-
-from server.config import config
 from server.db import Operation, Person
 
-COOKIES = {config.ACCESS_TOKEN_COOKIE: ''}
 
-
-@pytest.fixture(autouse=True)
-def _mock_check_token(mocker, user):
-    mocker.patch('jwt.decode', return_value={'id': user.id})
-
-
-def test_get_operations(client, person, operation):
+def test_get_operations(client, person, operation, headers):
     response = client.get(
         f'/api/users/{person.user_id}/persons/{person.id}/operations',
-        cookies=COOKIES,
+        headers=headers,
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == [
@@ -31,19 +21,19 @@ def test_get_operations(client, person, operation):
     ]
 
 
-def test_get_operations_with_wrong_person(client, person):
+def test_get_operations_with_wrong_person(client, person, headers):
     response = client.get(
-        f'/api/users/{person.user_id}/persons/0/operations', cookies=COOKIES
+        f'/api/users/{person.user_id}/persons/0/operations', headers=headers
     )
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_create_operation(client, person, db_session):
+def test_create_operation(client, person, db_session, headers):
     operation_data = {'value': 10, 'description': 'description'}
 
     response = client.post(
         f'/api/users/{person.user_id}/persons/{person.id}/operations',
-        cookies=COOKIES,
+        headers=headers,
         json=operation_data,
     )
     assert response.status_code == HTTPStatus.CREATED
@@ -62,10 +52,10 @@ def test_create_operation(client, person, db_session):
     assert update_person.balance == person.balance + operation_data['value']
 
 
-def test_delete_operation(client, person, operation, db_session):
+def test_delete_operation(client, person, operation, db_session, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/{person.id}/operations/{operation.id}',
-        cookies=COOKIES,
+        headers=headers,
     )
     assert response.status_code == HTTPStatus.OK
     assert db_session.query(Operation).filter_by(id=operation.id).one().deleted
@@ -74,9 +64,9 @@ def test_delete_operation(client, person, operation, db_session):
     assert update_person.balance == person.balance - operation.value
 
 
-def test_delete_person_not_founed(client, person, db_session):
+def test_delete_person_not_founed(client, person, db_session, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/{person.id}/operations/0',
-        cookies=COOKIES,
+        headers=headers,
     )
     assert response.status_code == HTTPStatus.NOT_FOUND

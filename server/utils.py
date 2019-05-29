@@ -2,7 +2,9 @@ from datetime import datetime, timedelta
 from typing import Any, List, Type, cast
 
 import jwt
-from fastapi import Cookie
+from fastapi import Depends
+from fastapi.security import HTTPBearer
+from fastapi.security.http import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
@@ -13,6 +15,7 @@ from .errors import ForbiddenError, UnauthorizedError
 JWT_ACCESS_SUBJECT = 'access'
 JWT_ALGORITHM = 'HS256'
 
+http_bearer = HTTPBearer()
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
@@ -36,12 +39,12 @@ def create_access_token(user: User) -> str:
     return token.decode()
 
 
-def check_access_token(
-    user_id: int, token: str = Cookie(..., alias=config.ACCESS_TOKEN_COOKIE)
+def check_access(
+    user_id: int, auth: HTTPAuthorizationCredentials = Depends(http_bearer)
 ) -> None:
     try:
         payload = jwt.decode(
-            token, config.SECRET_KEY, algorithms=[JWT_ALGORITHM]
+            auth.credentials, config.SECRET_KEY, algorithms=[JWT_ALGORITHM]
         )
     except jwt.PyJWTError:
         raise UnauthorizedError

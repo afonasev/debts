@@ -13,6 +13,7 @@ class UserIn(BaseModel):
 class UserOut(BaseModel):
     id: int
     email: EmailStr
+    token: str
 
 
 class Person(BaseModel):

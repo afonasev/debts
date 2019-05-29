@@ -1,22 +1,12 @@
 from http import HTTPStatus
 from unittest.mock import ANY
 
-import pytest
-
-from server.config import config
 from server.db import Person
 
-COOKIES = {config.ACCESS_TOKEN_COOKIE: ''}
 
-
-@pytest.fixture(autouse=True)
-def _mock_check_token(mocker, user):
-    mocker.patch('jwt.decode', return_value={'id': user.id})
-
-
-def test_get_persons(client, person):
+def test_get_persons(client, person, headers):
     response = client.get(
-        f'/api/users/{person.user_id}/persons', cookies=COOKIES
+        f'/api/users/{person.user_id}/persons', headers=headers
     )
     assert response.status_code == HTTPStatus.OK
     assert response.json() == [
@@ -30,9 +20,9 @@ def test_get_persons(client, person):
     ]
 
 
-def test_create_person(client, user, db_session):
+def test_create_person(client, user, db_session, headers):
     response = client.post(
-        f'/api/users/{user.id}/persons', cookies=COOKIES, json={'name': 'name'}
+        f'/api/users/{user.id}/persons', headers=headers, json={'name': 'name'}
     )
     assert response.status_code == HTTPStatus.CREATED
     assert response.json() == {
@@ -46,25 +36,25 @@ def test_create_person(client, user, db_session):
     assert db_session.query(Person).filter_by(id=response.json()['id']).one()
 
 
-def test_create_person_duplicate_name(client, person):
+def test_create_person_duplicate_name(client, person, headers):
     response = client.post(
         f'/api/users/{person.user_id}/persons',
-        cookies=COOKIES,
+        headers=headers,
         json={'name': person.name},
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_delete_person(client, person, db_session):
+def test_delete_person(client, person, db_session, headers):
     response = client.delete(
-        f'/api/users/{person.user_id}/persons/{person.id}', cookies=COOKIES
+        f'/api/users/{person.user_id}/persons/{person.id}', headers=headers
     )
     assert response.status_code == HTTPStatus.OK
     assert db_session.query(Person).filter_by(id=person.id).one().deleted
 
 
-def test_delete_person_not_founed(client, person, db_session):
+def test_delete_person_not_founed(client, person, db_session, headers):
     response = client.delete(
-        f'/api/users/{person.user_id}/persons/0', cookies=COOKIES
+        f'/api/users/{person.user_id}/persons/0', headers=headers
     )
     assert response.status_code == HTTPStatus.NOT_FOUND

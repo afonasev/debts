@@ -2,9 +2,7 @@ from http import HTTPStatus
 
 from fastapi import APIRouter
 from sqlalchemy.exc import IntegrityError
-from starlette.responses import JSONResponse
 
-from ..config import config
 from ..db import User, session
 from ..errors import DuplicateError, NotFoundError, WrongPasswordError
 from ..models import UserIn, UserOut
@@ -13,21 +11,8 @@ from ..utils import create_access_token, hash_password, verify_password
 router = APIRouter()
 
 
-def _response_with_token(user: User, status_code: int) -> JSONResponse:
-    response = JSONResponse(
-        {'id': user.id, 'email': user.email}, status_code=status_code
-    )
-    response.set_cookie(
-        key=config.ACCESS_TOKEN_COOKIE,
-        value=create_access_token(user),
-        secure=config.SECURE_COOKIES,
-        httponly=True,
-    )
-    return response
-
-
 @router.post('/token', response_model=UserOut)
-def create_token(user: UserIn) -> JSONResponse:
+def create_token(user: UserIn) -> UserOut:
     with session() as s:
         db_user = s.query(User).filter_by(email=user.email).one_or_none()
 
@@ -39,24 +24,32 @@ def create_token(user: UserIn) -> JSONResponse:
         ):
             raise WrongPasswordError
 
-        return _response_with_token(db_user, HTTPStatus.OK)
+        return UserOut(
+            id=db_user.id,
+            email=db_user.email,
+            token=create_access_token(db_user),
+        )
 
 
 @router.post(
     '/users', response_model=UserOut, status_code=HTTPStatus.CREATED.value
 )
-def create_user(user_in: UserIn) -> JSONResponse:
+def create_user(user_in: UserIn) -> UserOut:
     with session() as s:
-        user = User(
+        db_user = User(
             email=user_in.email,
             password_hash=hash_password(user_in.password.get_secret_value()),
         )
 
-        s.add(user)
+        s.add(db_user)
 
         try:
             s.commit()
         except IntegrityError:
             raise DuplicateError
 
-        return _response_with_token(user, HTTPStatus.CREATED)
+        return UserOut(
+            id=db_user.id,
+            email=db_user.email,
+            token=create_access_token(db_user),
+        )
