@@ -12,7 +12,7 @@ ENV PYTHONFAULTHANDLER=true
 ENV PYTHONUNBUFFERED=true
 
 RUN apk add --no-cache --update gcc libffi-dev musl-dev make postgresql-dev && \
-    pip install poetry uvicorn $(test "$ENVIRONMENT" == dev && echo "ipython")
+    pip install poetry uvicorn
 
 COPY ./docker/entrypoint.sh ./docker/server/start.sh /
 COPY pyproject.toml poetry.lock /
@@ -21,7 +21,7 @@ ARG ENVIRONMENT
 ENV ENVIRONMENT=${ENVIRONMENT}
 
 RUN poetry config settings.virtualenvs.create false \
-    && poetry install $(test "$ENVIRONMENT" != dev && echo "--no-dev") --no-interaction --no-ansi
+    && poetry install $(test "$ENVIRONMENT" != "dev" && echo "--no-dev") --no-interaction --no-ansi
 
 WORKDIR /app
 COPY ./server /app/server

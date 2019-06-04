@@ -14,7 +14,6 @@ services:
       MAX_REQUESTS: ${MAX_REQUESTS:-50000}
       LIMIT_CONCURRENCY: ${LIMIT_CONCURRENCY:-500}
 
-      SECURE_COOKIES: 'false'
       LOGGING_LEVEL: 'DEBUG'
       PYTHONASYNCIODEBUG: 'true'
       PYTEST_ADDOPTS: ${PYTEST_ADDOPTS:-}
@@ -22,7 +21,6 @@ services:
       - '${PORT:-8000}:8000'
     volumes:
       - '.:/app/'
-      # - './docker/server/start.sh:/start.sh:ro'
     restart: always
     init: true
     stdin_open: true

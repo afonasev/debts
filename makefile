@@ -9,13 +9,16 @@ up:
 	docker-compose up
 
 test:
-	$(DOCKER_RUN) make _test
+	$(DOCKER_RUN) make _test args="$(args)"
 
 lint:
 	$(DOCKER_RUN) make _lint
 
 pretty:
 	$(DOCKER_RUN) make _pretty
+
+repl:
+	$(DOCKER_RUN) ipython
 
 _test:
 	pytest --verbosity=2 --showlocals --strict --cov=$(CODE) $(args)
