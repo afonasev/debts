@@ -12,7 +12,7 @@ services:
       SECRET_KEY: &secret_key ${SECRET_KEY:-secret_key}
 
       WORKER_MAX_REQUESTS: ${WORKER_MAX_REQUESTS:-50000}
-      WORKER_LIMIT_CONCURRENCY: ${WORKER_LIMIT_CONCURRENCY:-500}
+      WORKER_LIMIT_CONCURRENCY: ${WORKER_LIMIT_CONCURRENCY:-1000}
 
       LOGGING_LEVEL: 'DEBUG'
       PYTHONASYNCIODEBUG: 'true'
@@ -47,3 +47,15 @@ services:
     image: 'postgres:11.2'
     environment:
       POSTGRES_PASSWORD: 'postgres'
+
+  # locust_master:
+  #   build:
+  #     context: .
+  #     dockerfile: 'docker/locust/Dockerfile'
+  #   command: --host http://server:8000/api
+  #   ports:
+  #     - '8089:8089'
+  #   volumes:
+  #     - './docker/locust/locustfile.py:/locustfile.py'
+  #   depends_on:
+  #     - server
