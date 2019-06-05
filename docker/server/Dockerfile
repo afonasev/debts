@@ -9,6 +9,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV PIP_NO_CACHE_DIR=off
 ENV PYTHONDONTWRITEBYTECODE=true
 ENV PYTHONFAULTHANDLER=true
+ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=true
 
 RUN apk add --no-cache --update gcc libffi-dev musl-dev make postgresql-dev && \

@@ -26,7 +26,7 @@ def _get_person(s: sa.orm.Session, user_id: int, person_id: int) -> Person:
     return cast(Person, db_person)
 
 
-@router.get(  # type: ignore
+@router.get(
     '/{user_id}/persons/{person_id}/operations',
     response_model=List[OperationOut],
 )

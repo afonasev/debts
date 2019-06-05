@@ -7,7 +7,6 @@ from .api.auth import router as auth_router
 from .api.operations import router as operations_router
 from .api.persons import router as persons_router
 from .config import config
-from .db import Base, engine
 from .utils import check_access
 
 
@@ -18,7 +17,6 @@ def create_app() -> FastAPI:
     init_cors(app)
     init_logging()
 
-    Base.metadata.create_all(bind=engine)  # type: ignore
     return app
 
 

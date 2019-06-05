@@ -13,9 +13,7 @@ from ..utils import objs_to_models
 router = APIRouter()
 
 
-@router.get(  # type: ignore
-    '/{user_id}/persons', response_model=List[PersonOut]
-)
+@router.get('/{user_id}/persons', response_model=List[PersonOut])
 def get_persons(user_id: int) -> List[PersonOut]:
     with session() as s:
         db_persons = (

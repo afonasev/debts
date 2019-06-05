@@ -9,10 +9,10 @@ services:
         ENVIRONMENT: ${ENVIRONMENT:-dev}
     environment:
       DATABASE: &db 'postgresql://postgres:postgres@postgres:5432/postgres'
-      SECRET_KEY: ${SECRET_KEY:-secret_key}
+      SECRET_KEY: &secret_key ${SECRET_KEY:-secret_key}
 
-      MAX_REQUESTS: ${MAX_REQUESTS:-50000}
-      LIMIT_CONCURRENCY: ${LIMIT_CONCURRENCY:-500}
+      WORKER_MAX_REQUESTS: ${WORKER_MAX_REQUESTS:-50000}
+      WORKER_LIMIT_CONCURRENCY: ${WORKER_LIMIT_CONCURRENCY:-500}
 
       LOGGING_LEVEL: 'DEBUG'
       PYTHONASYNCIODEBUG: 'true'
@@ -25,6 +25,21 @@ services:
     init: true
     stdin_open: true
     tty: true
+    depends_on:
+      - postgres
+
+  migrations:
+    build:
+      context: .
+      dockerfile: 'docker/server/Dockerfile'
+      args:
+        ENVIRONMENT: ${ENVIRONMENT:-dev}
+    command: alembic upgrade head
+    environment:
+      DATABASE: *db
+      SECRET_KEY: *secret_key
+    volumes:
+      - '.:/app/'
     depends_on:
       - postgres
 
