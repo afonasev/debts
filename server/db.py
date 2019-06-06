@@ -1,32 +1,57 @@
-from contextlib import closing, contextmanager
+import asyncio
+from contextvars import ContextVar
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Iterator, List
+from typing import Awaitable, Callable
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker
+from starlette.requests import Request
+from starlette.responses import Response
 
 from .config import config
-
-engine = sa.create_engine(config.DATABASE)
-session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from .utils import threadpool
 
 
-@contextmanager
-def session(*args: Any, **kwargs: Any) -> Iterator[sa.orm.Session]:
-    with closing(session_factory(*args, **kwargs)) as _session:
-        try:
-            yield _session
-        except Exception:
-            _session.rollback()
-            raise
-        else:
-            _session.commit()
+def scopefunc() -> int:
+    return _session_ctx.get()
+
+
+engine = sa.create_engine(
+    config.DATABASE,
+    pool_size=config.DB_POOL_SIZE,
+    pool_recycle=config.DB_POOL_RECYCLE,
+)
+_session_factory = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    expire_on_commit=False,  # because we want to return objects from handlers
+)
+_session_ctx: ContextVar[int] = ContextVar('session_scope', default=0)
+Session = scoped_session(_session_factory, scopefunc=scopefunc)
+
+
+async def session_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    _session_ctx.set(id(asyncio.current_task()))
+    response = await call_next(request)
+    await reset_session()
+    return response  # noqa:R504 unnecessary assign
+
+
+@threadpool
+def reset_session() -> None:
+    Session.expunge_all()  # because expire_on_commit=False
+    Session.remove()
 
 
 @as_declarative()
 class Base:
+    query = Session.query_property()
+
     id: int = sa.Column(sa.Integer, primary_key=True)
     created: bool = sa.Column(sa.DateTime, index=True, default=datetime.utcnow)
 
@@ -38,12 +63,15 @@ class Base:
 class DeletableMixin:
     deleted: datetime = sa.Column(sa.DateTime, index=True)
 
+    def delete(self) -> None:
+        self.deleted = datetime.utcnow()
+
 
 class User(Base):
-    email: str = sa.Column(sa.String, unique=True)
-    password_hash: str = sa.Column(sa.String, nullable=False)
+    email = sa.Column(sa.String, unique=True)
+    password_hash = sa.Column(sa.String, nullable=False)
 
-    persons: List['Person'] = sa.orm.relationship(
+    persons = sa.orm.relationship(
         'Person', backref='user', order_by='Person.balance'
     )
 
@@ -53,11 +81,11 @@ class User(Base):
 
 
 class Person(Base, DeletableMixin):
-    name: str = sa.Column(sa.String, nullable=False, index=True)
-    balance: Decimal = sa.Column(sa.DECIMAL, nullable=False, default=0)
-    user_id: int = sa.Column(sa.ForeignKey(User.id), nullable=False)
+    name = sa.Column(sa.String, nullable=False, index=True)
+    balance = sa.Column(sa.DECIMAL, nullable=False, default=0)
+    user_id = sa.Column(sa.ForeignKey(User.id), nullable=False)
 
-    operations: List['Operation'] = sa.orm.relationship(
+    operations = sa.orm.relationship(
         'Operation', backref='person', order_by='Operation.created'
     )
 
@@ -70,9 +98,9 @@ class Person(Base, DeletableMixin):
 
 
 class Operation(Base, DeletableMixin):
-    value: Decimal = sa.Column(sa.DECIMAL, nullable=False)
-    description: str = sa.Column(sa.String, nullable=False)
-    person_id: int = sa.Column(sa.ForeignKey(Person.id), nullable=False)
+    value = sa.Column(sa.DECIMAL, nullable=False)
+    description = sa.Column(sa.String, nullable=False)
+    person_id = sa.Column(sa.ForeignKey(Person.id), nullable=False)
 
     def __init__(
         self, person_id: int, value: Decimal, description: str

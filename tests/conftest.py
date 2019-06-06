@@ -2,11 +2,10 @@ import pytest
 from starlette.testclient import TestClient
 
 from server.app import app
-from server.db import Base, engine, session
+from server.db import Base, Session, engine
 from server.utils import create_access_token
 
 from .factories import OperationFactory, PersonFactory, UserFactory
-from .factories import session as factories_session
 
 
 @pytest.fixture()
@@ -15,17 +14,11 @@ def client():
         yield _client
 
 
-@pytest.fixture()
-def db_session():
-    with session() as s:
-        yield s
-
-
 @pytest.fixture(autouse=True)
 def _init_db():
     Base.metadata.create_all(engine)  # type: ignore
     yield
-    factories_session.remove()
+    Session.remove()
     Base.metadata.drop_all(engine)  # type: ignore
 
 

@@ -20,7 +20,7 @@ def test_get_persons(client, person, headers):
     ]
 
 
-def test_create_person(client, user, db_session, headers):
+def test_create_person(client, user, headers):
     response = client.post(
         f'/api/users/{user.id}/persons', headers=headers, json={'name': 'name'}
     )
@@ -33,7 +33,7 @@ def test_create_person(client, user, db_session, headers):
         'created': ANY,
     }
 
-    assert db_session.query(Person).filter_by(id=response.json()['id']).one()
+    assert Person.query.get(response.json()['id'])
 
 
 def test_create_person_duplicate_name(client, person, headers):
@@ -45,15 +45,15 @@ def test_create_person_duplicate_name(client, person, headers):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_delete_person(client, person, db_session, headers):
+def test_delete_person(client, person, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/{person.id}', headers=headers
     )
     assert response.status_code == HTTPStatus.OK
-    assert db_session.query(Person).filter_by(id=person.id).one().deleted
+    assert Person.query.filter_by(id=person.id).one().deleted
 
 
-def test_delete_person_not_founed(client, person, db_session, headers):
+def test_delete_person_not_founed(client, person, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/0', headers=headers
     )

@@ -8,12 +8,12 @@ TEST_PASSWORD = 'password'
 USER_JSON = {'email': TEST_EMAIL, 'password': TEST_PASSWORD}
 
 
-def test_create_user(client, db_session):
+def test_create_user(client):
     response = client.post('/api/auth/users', json=USER_JSON)
 
     assert response.status_code == HTTPStatus.CREATED
 
-    db_user = db_session.query(User).filter_by(email=TEST_EMAIL).one()
+    db_user = User.query.filter_by(email=TEST_EMAIL).one()
     assert response.json() == {
         'id': db_user.id,
         'email': db_user.email,
@@ -21,7 +21,7 @@ def test_create_user(client, db_session):
     }
 
 
-def test_create_duplicate_user(client, user, db_session):
+def test_create_duplicate_user(client, user):
     response = client.post(
         '/api/auth/users',
         json={'email': user.email, 'password': TEST_PASSWORD},
@@ -29,13 +29,13 @@ def test_create_duplicate_user(client, user, db_session):
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_create_token(client, db_session):
+def test_create_token(client):
     client.post('/api/auth/users', json=USER_JSON)
     response = client.post('/api/auth/token', json=USER_JSON)
 
     assert response.status_code == HTTPStatus.OK
 
-    db_user = db_session.query(User).filter_by(email=TEST_EMAIL).one()
+    db_user = User.query.filter_by(email=TEST_EMAIL).one()
     assert response.json() == {
         'id': db_user.id,
         'email': db_user.email,

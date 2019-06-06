@@ -1,4 +1,4 @@
-# debts
+# Debts
 
 [![Python: 3.7+](https://img.shields.io/badge/Python-3.6+-blue.svg)](https://pypi.org/project/debts)
 [![Build Status](https://travis-ci.org/Afonasev/debts.svg?branch=master)](https://travis-ci.org/Afonasev/debts)

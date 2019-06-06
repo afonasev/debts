@@ -1,5 +1,7 @@
+import asyncio
 from datetime import datetime, timedelta
-from typing import Any, List, Type, cast
+from functools import partial, wraps
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, List, Type, cast
 
 import jwt
 from fastapi import Depends
@@ -9,8 +11,12 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 from .config import config
-from .db import User
 from .errors import ForbiddenError, UnauthorizedError
+
+if TYPE_CHECKING:
+    from .db import User
+
+FUNC = Callable[[], Any]
 
 JWT_ACCESS_SUBJECT = 'access'
 JWT_ALGORITHM = 'HS256'
@@ -27,7 +33,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return cast(bool, pwd_context.verify(plain_password, hashed_password))
 
 
-def create_access_token(user: User) -> str:
+def create_access_token(user: 'User') -> str:
     delta = timedelta(seconds=config.ACCESS_TOKEN_LIFE_TIME)
     jwt_payload = {
         'id': user.id,
@@ -62,3 +68,13 @@ def obj_to_model(model: Type[BaseModel], obj: Any) -> BaseModel:
 
 def objs_to_models(model: Type[BaseModel], objs: List[Any]) -> List[BaseModel]:
     return [obj_to_model(model, i) for i in objs]
+
+
+def threadpool(func: FUNC) -> FUNC:
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Awaitable[Any]:
+        loop = asyncio.get_event_loop()
+        callback = partial(func, *args, **kwargs)
+        return loop.run_in_executor(None, callback)
+
+    return wrapper

@@ -1,14 +1,11 @@
 from factory import Faker
 from factory.alchemy import SESSION_PERSISTENCE_COMMIT, SQLAlchemyModelFactory
-from sqlalchemy.orm import scoped_session
 
-from server.db import Operation, Person, User, session_factory
-
-session = scoped_session(session_factory)
+from server.db import Operation, Person, Session, User
 
 
 class BaseMeta:
-    sqlalchemy_session = session
+    sqlalchemy_session = Session
     sqlalchemy_session_persistence = SESSION_PERSISTENCE_COMMIT
 
 

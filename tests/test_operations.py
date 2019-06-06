@@ -28,7 +28,7 @@ def test_get_operations_with_wrong_person(client, person, headers):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_create_operation(client, person, db_session, headers):
+def test_create_operation(client, person, headers):
     operation_data = {'value': 10, 'description': 'description'}
 
     response = client.post(
@@ -46,25 +46,25 @@ def test_create_operation(client, person, db_session, headers):
     }
 
     operation_id = response.json()['id']
-    assert db_session.query(Operation).filter_by(id=operation_id).one()
+    assert Operation.query.filter_by(id=operation_id).one()
 
-    update_person = db_session.query(Person).filter_by(id=person.id).one()
-    assert update_person.balance == person.balance + operation_data['value']
+    new_balance = Person.query.filter_by(id=person.id).value(Person.balance)
+    assert new_balance == person.balance + operation_data['value']
 
 
-def test_delete_operation(client, person, operation, db_session, headers):
+def test_delete_operation(client, person, operation, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/{person.id}/operations/{operation.id}',
         headers=headers,
     )
     assert response.status_code == HTTPStatus.OK
-    assert db_session.query(Operation).filter_by(id=operation.id).one().deleted
+    assert Operation.query.filter_by(id=operation.id).one().deleted
 
-    update_person = db_session.query(Person).filter_by(id=person.id).one()
-    assert update_person.balance == person.balance - operation.value
+    new_balance = Person.query.filter_by(id=person.id).value(Person.balance)
+    assert new_balance == person.balance - operation.value
 
 
-def test_delete_person_not_founed(client, person, db_session, headers):
+def test_delete_person_not_founed(client, person, headers):
     response = client.delete(
         f'/api/users/{person.user_id}/persons/{person.id}/operations/0',
         headers=headers,

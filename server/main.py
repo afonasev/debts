@@ -1,5 +1,7 @@
+import asyncio
 import logging
 
+from contextvars_executor import ContextVarExecutor
 from fastapi import Depends, FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
@@ -7,6 +9,7 @@ from .api.auth import router as auth_router
 from .api.operations import router as operations_router
 from .api.persons import router as persons_router
 from .config import config
+from .db import session_middleware
 from .utils import check_access
 
 
@@ -16,6 +19,9 @@ def create_app() -> FastAPI:
     init_routers(app)
     init_cors(app)
     init_logging()
+    setup_contextvar_executor()
+
+    app.middleware('http')(session_middleware)
 
     return app
 
@@ -50,3 +56,8 @@ def init_logging() -> None:
     logging.basicConfig(
         format=config.LOGGING_FORMAT, level=config.LOGGING_LEVEL
     )
+
+
+def setup_contextvar_executor() -> None:
+    loop = asyncio.get_event_loop()
+    loop.set_default_executor(ContextVarExecutor())
