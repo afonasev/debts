@@ -1,14 +1,13 @@
 import asyncio
 from datetime import datetime, timedelta
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, List, Type, cast
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, cast
 
 import jwt
 from fastapi import Depends
 from fastapi.security import HTTPBearer
 from fastapi.security.http import HTTPAuthorizationCredentials
 from passlib.context import CryptContext
-from pydantic import BaseModel
 
 from .config import config
 from .errors import ForbiddenError, UnauthorizedError
@@ -57,17 +56,6 @@ def check_access(
 
     if user_id != payload['id']:
         raise ForbiddenError
-
-
-def obj_to_model(model: Type[BaseModel], obj: Any) -> BaseModel:
-    fields = {}
-    for field in model.schema()['properties'].keys():
-        fields[field] = getattr(obj, field)
-    return model(**fields)
-
-
-def objs_to_models(model: Type[BaseModel], objs: List[Any]) -> List[BaseModel]:
-    return [obj_to_model(model, i) for i in objs]
 
 
 def threadpool(func: FUNC) -> FUNC:

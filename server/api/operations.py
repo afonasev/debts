@@ -6,7 +6,6 @@ from fastapi import APIRouter
 from ..db import Operation, Person, Session
 from ..errors import NotFoundError
 from ..models import OperationIn, OperationOut
-from ..utils import objs_to_models
 
 router = APIRouter()
 
@@ -33,7 +32,7 @@ def get_operations(user_id: int, person_id: int) -> List[OperationOut]:
         person_id=db_person.id, deleted=None
     ).all()
 
-    return objs_to_models(OperationOut, db_operations)  # type: ignore
+    return OperationOut.parse_many(db_operations)
 
 
 @router.post(
@@ -43,13 +42,13 @@ def get_operations(user_id: int, person_id: int) -> List[OperationOut]:
 )
 def create_operation(
     user_id: int, person_id: int, operation: OperationIn
-) -> Operation:
+) -> OperationOut:
     db_person = _get_person(user_id, person_id)
     db_operation = Operation(person_id=db_person.id, **operation.dict())
     db_person.balance = Person.balance + db_operation.value
     Session.add_all([db_person, db_operation])
     Session.commit()
-    return db_operation
+    return OperationOut.parse_one(db_operation)
 
 
 @router.delete('/{user_id}/persons/{person_id}/operations/{operation_id}')

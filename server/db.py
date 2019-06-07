@@ -23,12 +23,7 @@ engine = sa.create_engine(
     pool_size=config.DB_POOL_SIZE,
     pool_recycle=config.DB_POOL_RECYCLE,
 )
-_session_factory = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    expire_on_commit=False,  # because we want to return objects from handlers
-)
+_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 _session_ctx: ContextVar[int] = ContextVar('session_scope', default=0)
 Session = scoped_session(_session_factory, scopefunc=scopefunc)
 
@@ -37,14 +32,14 @@ async def session_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     _session_ctx.set(id(asyncio.current_task()))
-    response = await call_next(request)
-    await reset_session()
-    return response  # noqa:R504 unnecessary assign
+    try:
+        return await call_next(request)
+    finally:
+        await reset_session()
 
 
 @threadpool
 def reset_session() -> None:
-    Session.expunge_all()  # because expire_on_commit=False
     Session.remove()
 
 

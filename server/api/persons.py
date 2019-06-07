@@ -7,7 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from ..db import Person, Session
 from ..errors import DuplicateError, NotFoundError
 from ..models import PersonIn, PersonOut
-from ..utils import objs_to_models
 
 router = APIRouter()
 
@@ -15,7 +14,7 @@ router = APIRouter()
 @router.get('/{user_id}/persons', response_model=List[PersonOut])
 def get_persons(user_id: int) -> List[PersonOut]:
     db_persons = Person.query.filter_by(user_id=user_id, deleted=None).all()
-    return objs_to_models(PersonOut, db_persons)  # type: ignore
+    return PersonOut.parse_many(db_persons)
 
 
 @router.post(
@@ -23,7 +22,7 @@ def get_persons(user_id: int) -> List[PersonOut]:
     response_model=PersonOut,
     status_code=HTTPStatus.CREATED.value,
 )
-def create_person(user_id: int, person: PersonIn) -> Person:
+def create_person(user_id: int, person: PersonIn) -> PersonOut:
     db_person = Person(user_id=user_id, **person.dict())
 
     Session.add(db_person)
@@ -33,7 +32,7 @@ def create_person(user_id: int, person: PersonIn) -> Person:
     except IntegrityError:
         raise DuplicateError
 
-    return db_person
+    return PersonOut.parse_one(db_person)
 
 
 @router.delete('/{user_id}/persons/{person_id}')

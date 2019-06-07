@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from unittest.mock import ANY
 
-from server.db import Person
+from server.db import Person, Session
 
 
 def test_get_persons(client, person, headers):
@@ -50,7 +50,9 @@ def test_delete_person(client, person, headers):
         f'/api/users/{person.user_id}/persons/{person.id}', headers=headers
     )
     assert response.status_code == HTTPStatus.OK
-    assert Person.query.filter_by(id=person.id).one().deleted
+
+    Session.refresh(person)
+    assert person.deleted
 
 
 def test_delete_person_not_founed(client, person, headers):

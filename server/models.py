@@ -1,8 +1,24 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Any, List, Optional, Type, TypeVar
 
-from pydantic import BaseModel, EmailStr, SecretStr
+from pydantic import BaseModel as _BaseModel
+from pydantic import EmailStr, SecretStr
+
+T = TypeVar('T', bound=_BaseModel)
+
+
+class BaseModel(_BaseModel):
+    @classmethod
+    def parse_many(cls: Type[T], objs: List[Any]) -> List[T]:
+        return [cls.parse_one(i) for i in objs]  # type: ignore
+
+    @classmethod
+    def parse_one(cls: Type[T], obj: Any) -> T:
+        fields = {}
+        for field in cls.schema()['properties'].keys():
+            fields[field] = getattr(obj, field)
+        return cls(**fields)
 
 
 class UserIn(BaseModel):
