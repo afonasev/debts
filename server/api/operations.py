@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import List, cast
+from typing import List, Optional
 
 from fastapi import APIRouter
 
@@ -11,28 +11,26 @@ router = APIRouter()
 
 
 def _get_person(user_id: int, person_id: int) -> Person:
-    db_person = Person.query.filter_by(
+    db_person: Optional[Person] = Person.query.filter_by(
         id=person_id, user_id=user_id, deleted=None
     ).one_or_none()
 
     if not db_person:
         raise NotFoundError
 
-    return cast(Person, db_person)
+    return db_person
 
 
 @router.get(
     '/{user_id}/persons/{person_id}/operations',
     response_model=List[OperationOut],
 )
-def get_operations(user_id: int, person_id: int) -> List[OperationOut]:
+def get_operations(user_id: int, person_id: int) -> List[Operation]:
     db_person = _get_person(user_id, person_id)
 
-    db_operations = Operation.query.filter_by(
+    return Operation.query.filter_by(  # type: ignore
         person_id=db_person.id, deleted=None
     ).all()
-
-    return OperationOut.parse_many(db_operations)
 
 
 @router.post(
@@ -42,13 +40,13 @@ def get_operations(user_id: int, person_id: int) -> List[OperationOut]:
 )
 def create_operation(
     user_id: int, person_id: int, operation: OperationIn
-) -> OperationOut:
+) -> Operation:
     db_person = _get_person(user_id, person_id)
     db_operation = Operation(person_id=db_person.id, **operation.dict())
     db_person.balance = Person.balance + db_operation.value
     Session.add_all([db_person, db_operation])
     Session.commit()
-    return OperationOut.parse_one(db_operation)
+    return db_operation
 
 
 @router.delete('/{user_id}/persons/{person_id}/operations/{operation_id}')

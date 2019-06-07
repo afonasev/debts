@@ -23,7 +23,9 @@ engine = sa.create_engine(
     pool_size=config.DB_POOL_SIZE,
     pool_recycle=config.DB_POOL_RECYCLE,
 )
-_session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+_session_factory = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
+)
 _session_ctx: ContextVar[int] = ContextVar('session_scope', default=0)
 Session = scoped_session(_session_factory, scopefunc=scopefunc)
 

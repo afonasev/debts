@@ -12,9 +12,10 @@ router = APIRouter()
 
 
 @router.get('/{user_id}/persons', response_model=List[PersonOut])
-def get_persons(user_id: int) -> List[PersonOut]:
-    db_persons = Person.query.filter_by(user_id=user_id, deleted=None).all()
-    return PersonOut.parse_many(db_persons)
+def get_persons(user_id: int) -> List[Person]:
+    return Person.query.filter_by(  # type: ignore
+        user_id=user_id, deleted=None
+    ).all()
 
 
 @router.post(
@@ -22,7 +23,7 @@ def get_persons(user_id: int) -> List[PersonOut]:
     response_model=PersonOut,
     status_code=HTTPStatus.CREATED.value,
 )
-def create_person(user_id: int, person: PersonIn) -> PersonOut:
+def create_person(user_id: int, person: PersonIn) -> Person:
     db_person = Person(user_id=user_id, **person.dict())
 
     Session.add(db_person)
@@ -32,7 +33,7 @@ def create_person(user_id: int, person: PersonIn) -> PersonOut:
     except IntegrityError:
         raise DuplicateError
 
-    return PersonOut.parse_one(db_person)
+    return db_person
 
 
 @router.delete('/{user_id}/persons/{person_id}')
