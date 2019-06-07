@@ -1,8 +1,10 @@
 import asyncio
 import logging
 
+import sentry_sdk
 from contextvars_executor import ContextVarExecutor
 from fastapi import Depends, FastAPI
+from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from .api.auth import router as auth_router
@@ -19,9 +21,9 @@ def create_app() -> FastAPI:
     init_routers(app)
     init_cors(app)
     init_logging()
-    setup_contextvar_executor()
-
-    app.middleware('http')(session_middleware)
+    init_sentry(app)
+    init_db(app)
+    init_contextvar_executor()
 
     return app
 
@@ -58,6 +60,17 @@ def init_logging() -> None:
     )
 
 
-def setup_contextvar_executor() -> None:
+def init_contextvar_executor() -> None:
     loop = asyncio.get_event_loop()
     loop.set_default_executor(ContextVarExecutor())
+
+
+def init_sentry(app: FastAPI) -> None:
+    if not config.SENTRY_DSN:
+        return
+    sentry_sdk.init()
+    app.add_middleware(SentryMiddleware)
+
+
+def init_db(app: FastAPI) -> None:
+    app.middleware('http')(session_middleware)
