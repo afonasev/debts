@@ -7,7 +7,7 @@ import sys
 import sqlalchemy
 
 try:
-    engine_pro = sqlalchemy.create_engine("${DATABASE}").connect()
+    sqlalchemy.create_engine("${DATABASE_URL}").connect()
 except (sqlalchemy.exc.SQLAlchemyError, sqlalchemy.exc.DBAPIError) as e:
     print('Error:', e)
     sys.exit(-1)

@@ -18,11 +18,11 @@ RUN apk add --no-cache --update gcc libffi-dev musl-dev make postgresql-dev && \
 COPY ./docker/entrypoint.sh ./docker/server/start.sh /
 COPY pyproject.toml poetry.lock /
 
-ARG ENVIRONMENT
-ENV ENVIRONMENT=${ENVIRONMENT}
+ARG BUILD_DEV
+ENV BUILD_DEV=${BUILD_DEV}
 
 RUN poetry config settings.virtualenvs.create false \
-    && poetry install $(test "$ENVIRONMENT" != "dev" && echo "--no-dev") --no-interaction --no-ansi
+    && poetry install $(test "$BUILD_DEV" != "true" && echo "--no-dev") --no-interaction --no-ansi
 
 WORKDIR /app
 COPY ./server /app/server

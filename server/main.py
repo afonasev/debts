@@ -62,7 +62,7 @@ def init_logging() -> None:
 
 def init_contextvar_executor() -> None:
     loop = asyncio.get_event_loop()
-    loop.set_default_executor(ContextVarExecutor())
+    loop.set_default_executor(ContextVarExecutor(config.THREAD_POOL_SIZE))
 
 
 def init_sentry(app: FastAPI) -> None:

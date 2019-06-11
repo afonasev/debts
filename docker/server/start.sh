@@ -2,18 +2,16 @@
 set -e
 
 APP_MODULE="server.app:app"
-ENVIRONMENT=${ENVIRONMENT}
-HOST=${HOST:-0.0.0.0}
-WORKER_MAX_REQUESTS=${WORKER_MAX_REQUESTS}
-WORKER_LIMIT_CONCURRENCY=${WORKER_LIMIT_CONCURRENCY}
+BUILD_DEV=${BUILD_DEV}
+HOST=0.0.0.0
+WORKER_MAX_REQUESTS=${WORKER_MAX_REQUESTS:-50000}
+WORKER_LIMIT_CONCURRENCY=${WORKER_LIMIT_CONCURRENCY:-1000}
 
-echo "ENVIRONMENT: ${ENVIRONMENT}"
-
-if [ $ENVIRONMENT == "dev" ] ; then
+if [ $BUILD_DEV == "true" ] ; then
+    echo "[DEV BUILD]"
     exec uvicorn \
         --reload \
         --debug \
-        --no-access-log \
         --host $HOST \
         "$APP_MODULE"
 else

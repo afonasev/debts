@@ -19,9 +19,9 @@ def scopefunc() -> int:
 
 
 engine = sa.create_engine(
-    config.DATABASE,
-    pool_size=config.DB_POOL_SIZE,
-    pool_recycle=config.DB_POOL_RECYCLE,
+    config.DATABASE_URL,
+    pool_size=config.DATABASE_POOL_SIZE,
+    pool_recycle=config.DATABASE_POOL_RECYCLE,
 )
 _session_factory = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, expire_on_commit=False

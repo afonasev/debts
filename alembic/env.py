@@ -9,7 +9,7 @@ from server.db import Base
 config = context.config
 fileConfig(config.config_file_name)
 target_metadata = Base.metadata  # type: ignore
-DB_URL = os.environ['DATABASE']
+DB_URL = os.environ['DATABASE_URL']
 
 
 def run_migrations_offline() -> None:
