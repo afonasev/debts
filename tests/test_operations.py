@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from unittest.mock import ANY
 
-from server.db import Operation, Session
+from server.db import Operation, session
 
 
 def test_get_operations(client, person, operation, headers):
@@ -48,7 +48,7 @@ def test_create_operation(client, person, headers):
     operation_id = response.json()['id']
     assert Operation.query.filter_by(id=operation_id).one()
 
-    Session.refresh(person)
+    session.refresh(person)
     assert person.balance == operation_data['value']
 
 
@@ -59,10 +59,10 @@ def test_delete_operation(client, person, operation, headers):
     )
     assert response.status_code == HTTPStatus.OK
 
-    Session.refresh(operation)
+    session.refresh(operation)
     assert operation.deleted
 
-    Session.refresh(person)
+    session.refresh(person)
     assert person.balance == -operation.value
 
 

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter
 
-from ..db import Operation, Person, Session
+from ..db import Operation, Person, session
 from ..errors import NotFoundError
 from ..models import OperationIn, OperationOut
 
@@ -44,8 +44,8 @@ def create_operation(
     db_person = _get_person(user_id, person_id)
     db_operation = Operation(person_id=db_person.id, **operation.dict())
     db_person.balance = Person.balance + db_operation.value
-    Session.add_all([db_person, db_operation])
-    Session.commit()
+    session.add_all([db_person, db_operation])
+    session.commit()
     return db_operation
 
 
@@ -62,5 +62,5 @@ def delete_operation(user_id: int, person_id: int, operation_id: int) -> None:
 
     db_operation.delete()
     db_person.balance = Person.balance - db_operation.value
-    Session.add_all([db_person, db_operation])
-    Session.commit()
+    session.add_all([db_person, db_operation])
+    session.commit()

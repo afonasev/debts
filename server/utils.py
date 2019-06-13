@@ -15,7 +15,7 @@ from .errors import ForbiddenError, UnauthorizedError
 if TYPE_CHECKING:
     from .db import User
 
-FUNC = Callable[[], Any]
+FUNC = Callable[..., Any]
 
 JWT_ACCESS_SUBJECT = 'access'
 JWT_ALGORITHM = 'HS256'

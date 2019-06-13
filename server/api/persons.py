@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter
 from sqlalchemy.exc import IntegrityError
 
-from ..db import Person, Session
+from ..db import Person, session
 from ..errors import DuplicateError, NotFoundError
 from ..models import PersonIn, PersonOut
 
@@ -26,10 +26,10 @@ def get_persons(user_id: int) -> List[Person]:
 def create_person(user_id: int, person: PersonIn) -> Person:
     db_person = Person(user_id=user_id, **person.dict())
 
-    Session.add(db_person)
+    session.add(db_person)
 
     try:
-        Session.commit()
+        session.commit()
     except IntegrityError:
         raise DuplicateError
 
@@ -46,5 +46,5 @@ def delete_person(user_id: int, person_id: int) -> None:
         raise NotFoundError
 
     db_person.delete()
-    Session.add(db_person)
-    Session.commit()
+    session.add(db_person)
+    session.commit()

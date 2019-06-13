@@ -1,8 +1,8 @@
 import pytest
 from starlette.testclient import TestClient
 
-from server.app import app
-from server.db import Base, Session, engine
+from server.asgi import app
+from server.db import Base, engine, session
 from server.utils import create_access_token
 
 from .factories import OperationFactory, PersonFactory, UserFactory
@@ -18,7 +18,7 @@ def client():
 def _init_db():
     Base.metadata.create_all(engine)  # type: ignore
     yield
-    Session.remove()
+    session.remove()
     Base.metadata.drop_all(engine)  # type: ignore
 
 

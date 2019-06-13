@@ -3,7 +3,7 @@ from http import HTTPStatus
 from fastapi import APIRouter
 from sqlalchemy.exc import IntegrityError
 
-from ..db import Session, User
+from ..db import User, session
 from ..errors import DuplicateError, NotFoundError, WrongPasswordError
 from ..models import UserIn, UserOut
 from ..utils import create_access_token, hash_password, verify_password
@@ -37,10 +37,10 @@ def create_user(user_in: UserIn) -> UserOut:
         password_hash=hash_password(user_in.password.get_secret_value()),
     )
 
-    Session.add(db_user)
+    session.add(db_user)
 
     try:
-        Session.commit()
+        session.commit()
     except IntegrityError:
         raise DuplicateError
 

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from unittest.mock import ANY
 
-from server.db import Person, Session
+from server.db import Person, session
 
 
 def test_get_persons(client, person, headers):
@@ -51,7 +51,7 @@ def test_delete_person(client, person, headers):
     )
     assert response.status_code == HTTPStatus.OK
 
-    Session.refresh(person)
+    session.refresh(person)
     assert person.deleted
 
 

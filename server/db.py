@@ -15,25 +15,26 @@ from .utils import threadpool
 
 
 def scopefunc() -> int:
-    return _session_ctx.get()
+    return session_ctx.get()
 
 
 engine = sa.create_engine(
     config.DATABASE_URL,
     pool_size=config.DATABASE_POOL_SIZE,
     pool_recycle=config.DATABASE_POOL_RECYCLE,
+    max_overflow=config.DATABASE_MAX_OVERFLOW,
 )
-_session_factory = sessionmaker(
+session_factory = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
 )
-_session_ctx: ContextVar[int] = ContextVar('session_scope', default=0)
-Session = scoped_session(_session_factory, scopefunc=scopefunc)
+session_ctx = ContextVar('session_scope', default=0)
+session = scoped_session(session_factory, scopefunc=scopefunc)
 
 
 async def session_middleware(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
-    _session_ctx.set(id(asyncio.current_task()))
+    session_ctx.set(id(asyncio.current_task()))
     try:
         return await call_next(request)
     finally:
@@ -42,12 +43,12 @@ async def session_middleware(
 
 @threadpool
 def reset_session() -> None:
-    Session.remove()
+    session.remove()
 
 
 @as_declarative()
 class Base:
-    query = Session.query_property()
+    query = session.query_property()
 
     id: int = sa.Column(sa.Integer, primary_key=True)
     created: bool = sa.Column(sa.DateTime, index=True, default=datetime.utcnow)

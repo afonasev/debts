@@ -10,6 +10,7 @@ class Config(BaseSettings):
     DATABASE_URL: DSN
     DATABASE_POOL_RECYCLE: int = 60 * 10  # 10 minutes
     DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
 
     LOGGING_FORMAT: str = '%(asctime)s %(levelname)s %(name)s %(message)s'
     LOGGING_LEVEL: str = 'INFO'

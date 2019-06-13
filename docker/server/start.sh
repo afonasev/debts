@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 set -e
 
-APP_MODULE="server.app:app"
+APP_MODULE="server.asgi:app"
 BUILD_DEV=${BUILD_DEV}
 HOST=0.0.0.0
 WORKER_MAX_REQUESTS=${WORKER_MAX_REQUESTS:-50000}
