@@ -13,6 +13,8 @@ from starlette.responses import Response
 from .config import config
 from .utils import threadpool
 
+NEXT = Callable[[Request], Awaitable[Response]]
+
 
 def scopefunc() -> int:
     return session_ctx.get()
@@ -22,8 +24,10 @@ engine = sa.create_engine(
     config.DATABASE_URL,
     pool_size=config.DATABASE_POOL_SIZE,
     pool_recycle=config.DATABASE_POOL_RECYCLE,
-    max_overflow=config.DATABASE_MAX_OVERFLOW,
+    max_overflow=config.THREAD_POOL_SIZE,
+    echo=config.DATABASE_LOGGING_ENABLED,
 )
+
 session_factory = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
 )
@@ -31,9 +35,7 @@ session_ctx = ContextVar('session_scope', default=0)
 session = scoped_session(session_factory, scopefunc=scopefunc)
 
 
-async def session_middleware(
-    request: Request, call_next: Callable[[Request], Awaitable[Response]]
-) -> Response:
+async def session_middleware(request: Request, call_next: NEXT) -> Response:
     session_ctx.set(id(asyncio.current_task()))
     try:
         return await call_next(request)

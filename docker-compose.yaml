@@ -9,6 +9,7 @@ services:
         BUILD_DEV: ${BUILD_DEV:-true}
     environment:
       DATABASE_URL: &db 'postgresql://postgres:postgres@postgres:5432/postgres'
+      DATABASE_LOGGING_ENABLED: 'true'
       SECRET_KEY: &secret_key ${SECRET_KEY:-secret_key}
 
       SENTRY_DSN: ${SENTRY_DSN:-}

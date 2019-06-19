@@ -8,9 +8,9 @@ class Config(BaseSettings):
     ACCESS_TOKEN_LIFE_TIME: int = 60 * 60 * 24 * 365  # 1 year
 
     DATABASE_URL: DSN
+    DATABASE_LOGGING_ENABLED: bool = False
     DATABASE_POOL_RECYCLE: int = 60 * 10  # 10 minutes
     DATABASE_POOL_SIZE: int = 5
-    DATABASE_MAX_OVERFLOW: int = 10
 
     LOGGING_FORMAT: str = '%(asctime)s %(levelname)s %(name)s %(message)s'
     LOGGING_LEVEL: str = 'INFO'

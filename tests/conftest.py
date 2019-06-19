@@ -1,25 +1,43 @@
+from contextlib import contextmanager
+
 import pytest
 from starlette.testclient import TestClient
 
-from server.asgi import app
+from server.app import create_app
+from server.auth.utils import create_access_token
 from server.db import Base, engine, session
-from server.utils import create_access_token
 
 from .factories import OperationFactory, PersonFactory, UserFactory
 
 
+@contextmanager
+def disable_sql_log():
+    engine.echo = 0
+    yield
+    engine.echo = 1
+
+
+@pytest.fixture(autouse=True)
+def app():
+    return create_app(init_logging=False)
+
+
 @pytest.fixture()
-def client():
+def client(app):
     with TestClient(app) as _client:
         yield _client
 
 
 @pytest.fixture(autouse=True)
 def _init_db():
-    Base.metadata.create_all(engine)  # type: ignore
+    with disable_sql_log():
+        Base.metadata.create_all(engine)  # type: ignore
+
     yield
-    session.remove()
-    Base.metadata.drop_all(engine)  # type: ignore
+
+    with disable_sql_log():
+        session.remove()
+        Base.metadata.drop_all(engine)  # type: ignore
 
 
 @pytest.fixture()

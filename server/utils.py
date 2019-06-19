@@ -1,61 +1,15 @@
 import asyncio
-from datetime import datetime, timedelta
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, cast
+from typing import TYPE_CHECKING, Any, Awaitable, Callable
 
-import jwt
-from fastapi import Depends
-from fastapi.security import HTTPBearer
-from fastapi.security.http import HTTPAuthorizationCredentials
-from passlib.context import CryptContext
+from sqlalchemy.exc import IntegrityError
 
-from .config import config
-from .errors import ForbiddenError, UnauthorizedError
+from .errors import DuplicateError
 
 if TYPE_CHECKING:
-    from .db import User
+    from .db import Base
 
 FUNC = Callable[..., Any]
-
-JWT_ACCESS_SUBJECT = 'access'
-JWT_ALGORITHM = 'HS256'
-
-http_bearer = HTTPBearer()
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-
-def hash_password(password: str) -> str:
-    return cast(str, pwd_context.hash(password))
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return cast(bool, pwd_context.verify(plain_password, hashed_password))
-
-
-def create_access_token(user: 'User') -> str:
-    delta = timedelta(seconds=config.ACCESS_TOKEN_LIFE_TIME)
-    jwt_payload = {
-        'id': user.id,
-        'email': user.email,
-        'exp': datetime.utcnow() + delta,
-        'sub': JWT_ACCESS_SUBJECT,
-    }
-    token = jwt.encode(jwt_payload, config.SECRET_KEY, algorithm=JWT_ALGORITHM)
-    return token.decode()
-
-
-def check_access(
-    user_id: int, auth: HTTPAuthorizationCredentials = Depends(http_bearer)
-) -> None:
-    try:
-        payload = jwt.decode(
-            auth.credentials, config.SECRET_KEY, algorithms=[JWT_ALGORITHM]
-        )
-    except jwt.PyJWTError:
-        raise UnauthorizedError
-
-    if user_id != payload['id']:
-        raise ForbiddenError
 
 
 def threadpool(func: FUNC) -> FUNC:
@@ -66,3 +20,13 @@ def threadpool(func: FUNC) -> FUNC:
         return loop.run_in_executor(None, callback)
 
     return wrapper
+
+
+def save_unique_object(obj: 'Base') -> None:
+    from .db import session  # cycle ref
+
+    session.add(obj)
+    try:
+        session.commit()
+    except IntegrityError:
+        raise DuplicateError

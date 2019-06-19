@@ -28,7 +28,7 @@ else
 endif
 
 _test:
-	pytest --verbosity=2 --showlocals --strict --cov=$(CODE) $(args)
+	pytest --verbosity=2 --showlocals --strict --log-level=DEBUG --cov=$(CODE) $(args)
 
 _lint:
 	flake8 --jobs 4 --statistics --show-source $(CODE)

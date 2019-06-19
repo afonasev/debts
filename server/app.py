@@ -7,28 +7,30 @@ from fastapi import Depends, FastAPI
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
-from .api.auth import router as auth_router
-from .api.operations import router as operations_router
-from .api.persons import router as persons_router
+from .auth.routes import router as auth_router
+from .auth.utils import check_access
 from .config import config
 from .db import session_middleware
-from .utils import check_access
+from .operations.routes import router as operations_router
+from .persons.routes import router as persons_router
 
 
-def create_app() -> FastAPI:
+def create_app(init_logging: bool = True) -> FastAPI:
     app = FastAPI(title=config.PROJECT_NAME, version='1.0', docs_url='/api')
 
-    init_routers(app)
-    init_cors(app)
-    init_logging()
-    init_sentry(app)
-    init_db(app)
-    init_contextvar_executor()
+    if init_logging:
+        _init_logging()
+
+    _init_routers(app)
+    _init_cors(app)
+    _init_sentry(app)
+    _init_db(app)
+    _init_contextvar_executor()
 
     return app
 
 
-def init_cors(app: FastAPI) -> None:
+def _init_cors(app: FastAPI) -> None:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=['*'],
@@ -38,7 +40,7 @@ def init_cors(app: FastAPI) -> None:
     )
 
 
-def init_routers(app: FastAPI) -> None:
+def _init_routers(app: FastAPI) -> None:
     app.include_router(auth_router, prefix='/api/auth', tags=['Auth'])
     app.include_router(
         persons_router,
@@ -54,23 +56,24 @@ def init_routers(app: FastAPI) -> None:
     )
 
 
-def init_logging() -> None:
+def _init_logging() -> None:
     logging.basicConfig(
         format=config.LOGGING_FORMAT, level=config.LOGGING_LEVEL
     )
 
 
-def init_contextvar_executor() -> None:
+def _init_contextvar_executor() -> None:
     loop = asyncio.get_event_loop()
     loop.set_default_executor(ContextVarExecutor(config.THREAD_POOL_SIZE))
 
 
-def init_sentry(app: FastAPI) -> None:
+def _init_sentry(app: FastAPI) -> None:
     if not config.SENTRY_DSN:
         return
     sentry_sdk.init()
     app.add_middleware(SentryMiddleware)
 
 
-def init_db(app: FastAPI) -> None:
+def _init_db(app: FastAPI) -> None:
+    logging.getLogger('sqlalchemy.engine.base.Engine').handlers = []
     app.middleware('http')(session_middleware)
