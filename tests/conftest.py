@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 
 import pytest
@@ -9,12 +10,14 @@ from server.db import Base, engine, session
 
 from .factories import OperationFactory, PersonFactory, UserFactory
 
+sa_logger = logging.getLogger('sqlalchemy.engine.base.Engine')
+
 
 @contextmanager
 def disable_sql_log():
-    engine.echo = 0
+    sa_logger.setLevel(logging.ERROR)
     yield
-    engine.echo = 1
+    sa_logger.setLevel(logging.INFO)
 
 
 @pytest.fixture(autouse=True)

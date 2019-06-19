@@ -61,6 +61,10 @@ def _init_logging() -> None:
         format=config.LOGGING_FORMAT, level=config.LOGGING_LEVEL
     )
 
+    if config.DATABASE_LOGGING_ENABLED:
+        sa_logger = logging.getLogger('sqlalchemy.engine.base.Engine')
+        sa_logger.setLevel(logging.INFO)
+
 
 def _init_contextvar_executor() -> None:
     loop = asyncio.get_event_loop()
@@ -75,5 +79,4 @@ def _init_sentry(app: FastAPI) -> None:
 
 
 def _init_db(app: FastAPI) -> None:
-    logging.getLogger('sqlalchemy.engine.base.Engine').handlers = []
     app.middleware('http')(session_middleware)

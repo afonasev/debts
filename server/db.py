@@ -17,7 +17,7 @@ NEXT = Callable[[Request], Awaitable[Response]]
 
 
 def scopefunc() -> int:
-    return session_ctx.get()
+    return _session_ctx.get()
 
 
 engine = sa.create_engine(
@@ -25,26 +25,26 @@ engine = sa.create_engine(
     pool_size=config.DATABASE_POOL_SIZE,
     pool_recycle=config.DATABASE_POOL_RECYCLE,
     max_overflow=config.THREAD_POOL_SIZE,
-    echo=config.DATABASE_LOGGING_ENABLED,
 )
 
-session_factory = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
+_session_factory = sessionmaker(
+    bind=engine, autoflush=False, expire_on_commit=False
 )
-session_ctx = ContextVar('session_scope', default=0)
-session = scoped_session(session_factory, scopefunc=scopefunc)
+_session_ctx = ContextVar('session_scope', default=0)
+
+session = scoped_session(_session_factory, scopefunc=scopefunc)
 
 
 async def session_middleware(request: Request, call_next: NEXT) -> Response:
-    session_ctx.set(id(asyncio.current_task()))
+    _session_ctx.set(id(asyncio.current_task()))
     try:
         return await call_next(request)
     finally:
-        await reset_session()
+        await _reset_session()
 
 
 @threadpool
-def reset_session() -> None:
+def _reset_session() -> None:
     session.remove()
 
 
