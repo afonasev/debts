@@ -52,8 +52,8 @@ def _reset_session() -> None:
 class Base:
     query = session.query_property()
 
-    id: int = sa.Column(sa.Integer, primary_key=True)
-    created: bool = sa.Column(sa.DateTime, index=True, default=datetime.utcnow)
+    id = sa.Column(sa.Integer, primary_key=True)
+    created = sa.Column(sa.DateTime, index=True, default=datetime.utcnow)
 
     @declared_attr
     def __tablename__(cls) -> str:  # noqa:N805
@@ -61,7 +61,7 @@ class Base:
 
 
 class DeletableMixin:
-    deleted: datetime = sa.Column(sa.DateTime, index=True)
+    deleted = sa.Column(sa.DateTime, index=True)
 
     def delete(self) -> None:
         self.deleted = datetime.utcnow()
