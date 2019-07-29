@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import sentry_sdk
+from context_logging import setup_log_record
 from contextvars_executor import ContextVarExecutor
 from fastapi import Depends, FastAPI
 from sentry_asgi import SentryMiddleware
@@ -13,6 +14,7 @@ from .config import config
 from .db import session_middleware
 from .operations.routes import router as operations_router
 from .persons.routes import router as persons_router
+from .utils import context_middleware
 
 
 def create_app(init_logging: bool = True) -> FastAPI:
@@ -21,11 +23,11 @@ def create_app(init_logging: bool = True) -> FastAPI:
     if init_logging:
         _init_logging()
 
+    _init_context(app)
     _init_routers(app)
     _init_cors(app)
     _init_sentry(app)
     _init_db(app)
-    _init_contextvar_executor()
 
     return app
 
@@ -65,10 +67,7 @@ def _init_logging() -> None:
         sa_logger = logging.getLogger('sqlalchemy.engine.base.Engine')
         sa_logger.setLevel(logging.INFO)
 
-
-def _init_contextvar_executor() -> None:
-    loop = asyncio.get_event_loop()
-    loop.set_default_executor(ContextVarExecutor(config.THREAD_POOL_SIZE))
+    setup_log_record()
 
 
 def _init_sentry(app: FastAPI) -> None:
@@ -80,3 +79,9 @@ def _init_sentry(app: FastAPI) -> None:
 
 def _init_db(app: FastAPI) -> None:
     app.middleware('http')(session_middleware)
+
+
+def _init_context(app: FastAPI) -> None:
+    app.middleware('http')(context_middleware)
+    loop = asyncio.get_event_loop()
+    loop.set_default_executor(ContextVarExecutor(config.THREAD_POOL_SIZE))

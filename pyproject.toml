@@ -12,6 +12,7 @@ keywords = []
 [tool.poetry.dependencies]
 python = "^3.7"
 alembic = "^1.0"
+context_logging = "^0.2.0"
 contextvars_executor = "^0.0.1"
 fastapi = {version = ">=0.18,<=2.0", extras = ["all"]}
 passlib = {version = "^1.7", extras = ["bcrypt"]}

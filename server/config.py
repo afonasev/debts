@@ -12,7 +12,7 @@ class Config(BaseSettings):
     DATABASE_POOL_RECYCLE: int = 60 * 10  # 10 minutes
     DATABASE_POOL_SIZE: int = 5
 
-    LOGGING_FORMAT: str = '%(asctime)s %(levelname)s %(name)s %(message)s'
+    LOGGING_FORMAT: str = '%(asctime)s %(levelname)s %(name)s %(message)s %(context)s'
     LOGGING_LEVEL: str = 'INFO'
 
     SECRET_KEY: str
