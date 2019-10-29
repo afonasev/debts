@@ -11,7 +11,7 @@ keywords = []
 
 [tool.poetry.dependencies]
 python = "^3.7"
-alembic = "^1.0"
+alembic = "^1.2"
 context_logging = "^0.2.0"
 contextvars_executor = "^0.0.1"
 fastapi = {version = ">=0.18,<=2.0", extras = ["all"]}
