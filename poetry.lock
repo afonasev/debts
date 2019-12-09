@@ -52,13 +52,17 @@ category = "dev"
 description = "An abstract syntax tree for Python with inference support."
 name = "astroid"
 optional = false
-python-versions = ">=3.4.*"
-version = "2.1.0"
+python-versions = ">=3.5.*"
+version = "2.3.3"
 
 [package.dependencies]
-lazy-object-proxy = "*"
-six = "*"
-wrapt = "*"
+lazy-object-proxy = ">=1.4.0,<1.5.0"
+six = ">=1.12,<2.0"
+wrapt = ">=1.11.0,<1.12.0"
+
+[package.dependencies.typed-ast]
+python = "<3.8"
+version = ">=1.4.0,<1.5"
 
 [[package]]
 category = "dev"
@@ -879,14 +883,14 @@ category = "dev"
 description = "python code static checker"
 name = "pylint"
 optional = false
-python-versions = ">=3.4.*"
-version = "2.2.3"
+python-versions = ">=3.5.*"
+version = "2.4.4"
 
 [package.dependencies]
-astroid = ">=2.0,<2.2.0"
+astroid = ">=2.3.0,<2.4"
 colorama = "*"
-isort = ">=4.2.5"
-mccabe = "*"
+isort = ">=4.2.5,<5"
+mccabe = ">=0.6,<0.7"
 
 [[package]]
 category = "dev"
@@ -1235,7 +1239,7 @@ python-versions = ">=2.7"
 version = "0.5.1"
 
 [metadata]
-content-hash = "307156470440fd924880b43857f6a7767fdfadac13954c4ecbb7bdffddff3295"
+content-hash = "7a429ce565566687d440c554e0f535444fb7a7778d81517b8b97649252a4f8ad"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -1244,7 +1248,7 @@ alembic = ["49277bb7242192bbb9eac58fed4fe02ec6c3a2a4b4345d2171197459266482b2"]
 aniso8601 = ["b8a6a9b24611fc50cf2d9b45d371bfdc4fd0581d1cc52254f5502130a776d4af", "bb167645c79f7a438f9dfab6161af9bed75508c645b1f07d1158240841d22673"]
 appdirs = ["9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92", "d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e"]
 appnope = ["5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0", "8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"]
-astroid = ["35b032003d6a863f5dcd7ec11abd5cd5893428beaa31ab164982403bcb311f22", "6a5d668d7dc69110de01cdf7aeec69a679ef486862a0850cc0fd5571505b6b7e"]
+astroid = ["71ea07f44df9568a75d0f354c49143a4575d90645e9fead6dfb52c26a85ed13a", "840947ebfa8b58f318d42301cf8c0a20fd794a33b61cc4638e28e9e61ba32f42"]
 atomicwrites = ["03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4", "75a9445bac02d8d058d5e1fe689654ba5a6556a1dfd8ce6ec55a0ed79866cfa6"]
 attrs = ["10cbf6e27dbce8c30807caf056c8eb50917e0eaafe86347671b57254006c3e69", "ca4be454458f9dec299268d472aaa5a11f67a4ff70093396e1ceae9c76cf4bbb"]
 backcall = ["38ecd85be2c1e78f77fd91700c76e14667dc21e2713b63876c0eb901196e01e4", "bbbf4b1e5cd2bdb08f915895b51081c041bac22394fdfcfdfbe9f14b77c08bf2"]
@@ -1322,7 +1326,7 @@ pydantic = ["b72e0df2463cee746cf42639845d4106c19f30136375e779352d710e69617731", 
 pyflakes = ["17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0", "d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"]
 pygments = ["71e430bc85c88a430f000ac1d9b331d2407f681d6f6aec95e8bcfbc3df5b0127", "881c4c157e45f30af185c1ffe8d549d48ac9127433f2c380c24b84572ad66297"]
 pyjwt = ["5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e", "8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"]
-pylint = ["13109caab4972cb6d7395e94ad7189e93e9454f09ededaa6b6784cc5456d41f1", "31f997da02c3a41391a44e073c3572eb3ee923608dd9984df451ff8ddf92cfde"]
+pylint = ["3db5468ad013380e987410a8d6956226963aed94ecb5f9d3a28acca6d9ac36cd", "886e6afc935ea2590b462664b161ca9a5e40168ea99e5300935f6591ad467df4"]
 pyparsing = ["6f98a7b9397e206d78cc01df10131398f1c8b8510a2f4d97d9abd82e1aacdd80", "d9338df12903bbf5d65a0e4e87c2161968b10d2e489652bb47001d82a9b028b4"]
 pyrepl = ["292570f34b5502e871bbb966d639474f2b57fbfcd3373c2d6a2f3d56e681a775"]
 pytest = ["63344a2e3bce2e4d522fd62b4fdebb647c019f1f9e4ca075debbd13219db4418", "f67403f33b2b1d25a6756184077394167fe5e2f9d8bdaab30707d19ccec35427"]
