@@ -61,6 +61,24 @@ six = "*"
 wrapt = "*"
 
 [[package]]
+category = "main"
+description = "AsyncExitStack backport for Python 3.5+"
+marker = "extra == \"all\""
+name = "async-exit-stack"
+optional = false
+python-versions = ">=3.5"
+version = "1.0.1"
+
+[[package]]
+category = "main"
+description = "Async generators and context managers for Python 3.5+"
+marker = "extra == \"all\""
+name = "async-generator"
+optional = false
+python-versions = ">=3.5"
+version = "1.10"
+
+[[package]]
 category = "dev"
 description = "Atomic file writes."
 marker = "sys_platform == \"win32\""
@@ -272,19 +290,21 @@ description = "FastAPI framework, high performance, easy to learn, fast to code,
 name = "fastapi"
 optional = false
 python-versions = ">=3.6"
-version = "0.29.1"
+version = "0.46.0"
 
 [package.dependencies]
 aiofiles = "*"
+async_exit_stack = "*"
+async_generator = "*"
 email_validator = "*"
 graphene = "*"
 itsdangerous = "*"
 jinja2 = "*"
-pydantic = "0.26"
+pydantic = ">=0.32.2,<2.0.0"
 python-multipart = "*"
 pyyaml = "*"
 requests = "*"
-starlette = ">=0.11.1,<=0.12.0"
+starlette = "0.12.9"
 ujson = "*"
 uvicorn = "*"
 
@@ -848,7 +868,7 @@ description = "Data validation and settings management using python 3.6 type hin
 name = "pydantic"
 optional = false
 python-versions = ">=3.6"
-version = "0.26"
+version = "1.3"
 
 [[package]]
 category = "dev"
@@ -1077,7 +1097,7 @@ description = "The little ASGI library that shines."
 name = "starlette"
 optional = false
 python-versions = ">=3.6"
-version = "0.12.0"
+version = "0.12.9"
 
 [[package]]
 category = "dev"
@@ -1245,6 +1265,8 @@ aniso8601 = ["b8a6a9b24611fc50cf2d9b45d371bfdc4fd0581d1cc52254f5502130a776d4af",
 appdirs = ["9e5896d1372858f8dd3344faf4e5014d21849c756c8d5701f78f8a103b372d92", "d8b24664561d0d34ddfaec54636d502d7cea6e29c3eaf68f3df6180863e2166e"]
 appnope = ["5b26757dc6f79a3b7dc9fab95359328d5747fcb2409d331ea66d0272b90ab2a0", "8b995ffe925347a2138d7ac0fe77155e4311a0ea6d6da4f5128fe4b3cbe5ed71"]
 astroid = ["35b032003d6a863f5dcd7ec11abd5cd5893428beaa31ab164982403bcb311f22", "6a5d668d7dc69110de01cdf7aeec69a679ef486862a0850cc0fd5571505b6b7e"]
+async-exit-stack = ["24de1ad6d0ff27be97c89d6709fa49bf20db179eaf1f4d2e6e9b4409b80e747d", "9b43b17683b3438f428ef3bbec20689f5abbb052aa4b564c643397330adfaa99"]
+async-generator = ["01c7bf666359b4967d2cda0000cc2e4af16a0ae098cbffcb8472fb9e8ad6585b", "6ebb3d106c12920aaae42ccb6f787ef5eefdcdd166ea3d628fa8476abe712144"]
 atomicwrites = ["03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4", "75a9445bac02d8d058d5e1fe689654ba5a6556a1dfd8ce6ec55a0ed79866cfa6"]
 attrs = ["10cbf6e27dbce8c30807caf056c8eb50917e0eaafe86347671b57254006c3e69", "ca4be454458f9dec299268d472aaa5a11f67a4ff70093396e1ceae9c76cf4bbb"]
 backcall = ["38ecd85be2c1e78f77fd91700c76e14667dc21e2713b63876c0eb901196e01e4", "bbbf4b1e5cd2bdb08f915895b51081c041bac22394fdfcfdfbe9f14b77c08bf2"]
@@ -1266,7 +1288,7 @@ eradicate = ["4ffda82aae6fd49dfffa777a857cb758d77502a1f2e0f54c9ac5155a39d2d01a"]
 factory-boy = ["728df59b372c9588b83153facf26d3d28947fc750e8e3c95cefa9bed0e6394ee", "faf48d608a1735f0d0a3c9cbf536d64f9132b547dae7ba452c4d99a79e84a370"]
 faker = ["1c0a5e7bb54d2c54569986a27124715c83899e592d8d61d4e372dbff6c699573", "60477f757a80f665bbe1fb3d1cfe5d205ec7b99d5240114de7b27b4c25d236ca"]
 fancycompleter = ["d2522f1f3512371f295379c4c0d1962de06762eb586c199620a2a5d423539b12"]
-fastapi = ["4bc46cf460ee60a8dc05e0bfb6fcddb1abc8a8043509bdd02f8757beac2d1f09", "e9bcd06c4919487aedda55cab53444feb1c09630f30522ca3640a0da45a6cfe3"]
+fastapi = ["6c9b919f2ed742d2ad78e6dce5ad1be761e67292b838ba114cb525ec784d10a1", "7f8d795be11e21675b6843424b378fe2ec95a14cecba1c53c68471412cca28c7"]
 flake8 = ["859996073f341f2670741b51ec1e67a01da142831aa1fdc6242dbf88dffbe661", "a796a115208f5c03b18f332f7c11729812c8c3ded6c46319c59b53efd3819da8"]
 flake8-awesome = ["17a3a5a7d55b8690c57b1afa0d9a64d030e6aed17edc04bbb7c134aac88c8629", "988f693c1c6246ad227a7f56b1748fb7eccb87259c4556694c36a3f776cfd1cc"]
 flake8-breakpoint = ["27e0cb132647f9ef348b4a3c3126e7350bedbb22e8e221cd11712a223855ea0b", "5bc70d478f0437a3655d094e1d2fca81ddacabaa84d99db45ad3630bf2004064"]
@@ -1318,7 +1340,7 @@ ptyprocess = ["923f299cc5ad920c68f2bc0bc98b75b9f838b93b599941a6b63ddbc2476394c0"
 py = ["64f65755aee5b381cea27766a3a147c3f15b9b6b9ac88676de66ba2ae36793fa", "dc639b046a6e2cff5bbe40194ad65936d6ba360b52b3c3fe1d08a82dd50b5e53"]
 pycodestyle = ["95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56", "e40a936c9a450ad81df37f549d676d127b1b66000a6c500caa2b085bc0ca976c"]
 pycparser = ["a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"]
-pydantic = ["b72e0df2463cee746cf42639845d4106c19f30136375e779352d710e69617731", "dab99d3070e040b8b2e987dfbe237350ab92d5d57a22d4e0e268ede2d85c7964"]
+pydantic = ["176885123dfdd8f7ab6e7ba1b66d4197de75ba830bb44d921af88b3d977b8aa5", "2b32a5f14558c36e39aeefda0c550bfc0f47fc32b4ce16d80dc4df2b33838ed8", "2eab7d548b0e530bf65bee7855ad8164c2f6a889975d5e9c4eefd1e7c98245dc", "479ca8dc7cc41418751bf10302ee0a1b1f8eedb2de6c4f4c0f3cf8372b204f9a", "59235324dd7dc5363a654cd14271ea8631f1a43de5d4fc29c782318fcc498002", "87673d1de790c8d5282153cab0b09271be77c49aabcedf3ac5ab1a1fd4dcbac0", "8a8e089aec18c26561e09ee6daf15a3cc06df05bdc67de60a8684535ef54562f", "b60f2b3b0e0dd74f1800a57d1bbd597839d16faf267e45fa4a5407b15d311085", "c0da48978382c83f9488c6bbe4350e065ea5c83e85ca5cfb8fa14ac11de3c296", "cbe284bd5ad67333d49ecc0dc27fa52c25b4c2fe72802a5c060b5f922db58bef", "d03df07b7611004140b0fef91548878c2b5f48c520a8cb76d11d20e9887a495e", "d4bb6a75abc2f04f6993124f1ed4221724c9dc3bd9df5cb54132e0b68775d375", "dacb79144bb3fdb57cf9435e1bd16c35586bc44256215cfaa33bf21565d926ae", "dd9359db7644317898816f6142f378aa48848dcc5cf14a481236235fde11a148"]
 pyflakes = ["17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0", "d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"]
 pygments = ["71e430bc85c88a430f000ac1d9b331d2407f681d6f6aec95e8bcfbc3df5b0127", "881c4c157e45f30af185c1ffe8d549d48ac9127433f2c380c24b84572ad66297"]
 pyjwt = ["5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e", "8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"]
@@ -1340,7 +1362,7 @@ sentry-asgi = ["0fc35fc6da9c16c0353f087c29fcfcd694b767bd1a77a2e768f519618eb3defd
 sentry-sdk = ["31adb5dc65ef35cabb48e3d7ad9804d885f22e74ef606a266beb31661d59a226", "52881e11649d7e5a0b04c026adcf473ab16d0ec4a1cf5e7259dd292c984264ef"]
 six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"]
 sqlalchemy = ["afa5541e9dea8ad0014251bc9d56171ca3d8b130c9627c6cb3681cff30be3f8a"]
-starlette = ["d313433ef5cc38e0a276b59688ca2b11b8f031c78808c1afdf9d55cb86f34590"]
+starlette = ["c2ac9a42e0e0328ad20fe444115ac5e3760c1ee2ac1ff8cdb5ec915c4a453411"]
 testfixtures = ["665a298976c8d77f311b65c46f16b7cda7229a47dff5ad7c822e5b3371a439e2", "9d230c5c80746f9f86a16a1f751a5cf5d8e317d4cc48243a19fb180d22303bce"]
 text-unidecode = ["5a1375bb2ba7968740508ae38d92e1f889a0832913cb1c447d5e2046061a396d", "801e38bd550b943563660a91de8d4b6fa5df60a542be9093f7abf819f86050cc"]
 toml = ["229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c", "235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e", "f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"]
