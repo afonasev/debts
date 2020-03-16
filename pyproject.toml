@@ -31,7 +31,7 @@ pdbpp = "^0.10.2"
 pylint = "^2.2"
 pytest = "^5.3"
 pytest-cov = "^2.8"
-pytest-deadfixtures = "^2.1"
+pytest-deadfixtures = "^2.2"
 pytest-mock = "^1.13"
 unify = "^0.5"
 
