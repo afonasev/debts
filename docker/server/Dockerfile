@@ -27,7 +27,7 @@ RUN poetry config settings.virtualenvs.create false \
 WORKDIR /app
 COPY ./server /app/server
 
-EXPOSE 8000
+EXPOSE 8080
 
 USER app
 CMD ["sh", "/start.sh"]

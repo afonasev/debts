@@ -1,5 +1,5 @@
 CODE = server tests alembic
-DOCKER_RUN = docker-compose run --rm server
+DOCKER = docker-compose run --rm server
 
 init:
 	python3 -m venv .venv
@@ -9,16 +9,16 @@ up:
 	docker-compose up
 
 test:
-	$(DOCKER_RUN) make _test args="$(args)"
+	$(DOCKER) make _test args="$(args)"
 
 lint:
-	$(DOCKER_RUN) make _lint
+	$(DOCKER) make _lint
 
 pretty:
-	$(DOCKER_RUN) make _pretty
+	$(DOCKER) make _pretty
 
 repl:
-	$(DOCKER_RUN) ipython
+	$(DOCKER) ipython
 
 new_migration:
 ifeq ($(m),)
@@ -31,15 +31,15 @@ _test:
 	pytest --verbosity=2 --showlocals --strict --log-level=DEBUG --cov=$(CODE) $(args)
 
 _lint:
-	flake8 --jobs 4 --statistics --show-source $(CODE)
-	pylint --jobs 4 --rcfile=setup.cfg $(CODE)
+	flake8 --jobs=4 --statistics --show-source $(CODE)
+	pylint --rcfile=setup.cfg $(CODE)
 	mypy $(CODE)
-	black --target-version=py37 --skip-string-normalization --line-length=79 --check $(CODE)
+	black --skip-string-normalization --check $(CODE)
 	pytest --dead-fixtures --dup-fixtures
 
 _pretty:
 	isort --apply --recursive $(CODE)
-	black --target-version=py37 --skip-string-normalization --line-length=79 $(CODE)
+	black --skip-string-normalization $(CODE)
 	unify --in-place --recursive $(CODE)
 
 precommit_install:

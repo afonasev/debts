@@ -11,7 +11,8 @@ from .utils import create_access_token, hash_password, verify_password
 
 router = APIRouter()
 
-
+# todo
+# FIXME
 @router.post('/token', response_model=UserOut)
 def create_token(user: UserIn) -> UserOut:
     db_user = _get_user(user)
